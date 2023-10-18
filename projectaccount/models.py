@@ -45,6 +45,9 @@ class AccountManager(BaseUserManager):
 class Subject(models.Model):
     name = models.CharField(max_length=50,null=True,blank=True)
 
+class Semester(models.Model):
+    name = models.CharField(max_length=50,null=True,blank=True)
+
 
 class Account(AbstractBaseUser):
     user_admin = "admin"
@@ -69,6 +72,9 @@ class Account(AbstractBaseUser):
     phone = models.IntegerField(null=True, blank=True)
     subject = models.ForeignKey(
         Subject, on_delete=models.CASCADE, related_name="subject_name", null=True, blank=True
+    )
+    semester = models.ForeignKey(
+        Semester, on_delete=models.CASCADE, related_name="semester_name", null=True, blank=True
     )
     copy_pass = models.CharField(max_length=140, null=True, blank=True)
     register_number = models.IntegerField(null=True, blank=True)
