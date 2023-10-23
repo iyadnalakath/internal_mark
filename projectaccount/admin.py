@@ -16,7 +16,7 @@ class AccountAdmin(UserAdmin):
         "is_active",
         "full_name",
         "role",
-        "subject"
+        # "subject"
     )
     search_fields = (
         "pk",

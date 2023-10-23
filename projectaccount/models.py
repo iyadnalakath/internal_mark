@@ -42,11 +42,15 @@ class AccountManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-class Subject(models.Model):
-    name = models.CharField(max_length=50,null=True,blank=True)
 
 class Semester(models.Model):
     name = models.CharField(max_length=50,null=True,blank=True)
+
+class Subject(models.Model):
+    name = models.CharField(max_length=50,null=True,blank=True)
+    semester = models.ForeignKey(
+        Semester, on_delete=models.CASCADE, related_name="semester_subject", null=True, blank=True
+    )
 
 
 class Account(AbstractBaseUser):
@@ -70,11 +74,14 @@ class Account(AbstractBaseUser):
     is_superuser = models.BooleanField(default=False, null=True, blank=True)
     full_name = models.CharField(max_length=30,null=True, blank=True)
     phone = models.IntegerField(null=True, blank=True)
-    subject = models.ForeignKey(
-        Subject, on_delete=models.CASCADE, related_name="subject_name", null=True, blank=True
+    subject = models.ManyToManyField(
+        Subject, related_name="subject_name"
     )
-    semester = models.ForeignKey(
-        Semester, on_delete=models.CASCADE, related_name="semester_name", null=True, blank=True
+    # semester = models.ForeignKey(
+    #     Semester, on_delete=models.CASCADE, related_name="semester_name", null=True, blank=True
+    # )
+    semester = models.ManyToManyField(
+        Semester, related_name="semester_name"
     )
     copy_pass = models.CharField(max_length=140, null=True, blank=True)
     register_number = models.IntegerField(null=True, blank=True)
