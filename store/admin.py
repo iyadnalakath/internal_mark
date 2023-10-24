@@ -14,7 +14,7 @@ admin.site.register(Semester, SemesterAdmin)
 
 
 class SubjectAdmin(admin.ModelAdmin):
-    list_display = ("id", "name","semester")
+    list_display = ("id", "name", "semester")
 
 
 admin.site.register(Subject, SubjectAdmin)
