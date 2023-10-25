@@ -16,6 +16,7 @@ router.register("subject", views.SubjectViews,basename="subject"),
 router.register("semester", views.SemesterViews,basename="semester"),
 router.register("teacher/registration", views.TeacherRegistrationView,basename="teacher"),
 router.register("student/add", views.StudentRegistrationView,basename="student"),
+router.register("theory/internalmark", views.TheoryInternalMarkViews,basename="theory_internalmark"),
 # router.register("event_management_users", views.EventManagementUsersView)
 # router.register('eventteamlistsubcatagory',views.EventManagementSubcategoryViewSet,basename='MyModel')
 

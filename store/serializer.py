@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from projectaccount.models import Account, Subject ,Semester
-from .models import Student
+from .models import Student, TheoryInternalMark
 
 
 
@@ -15,7 +15,7 @@ class SubjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subject
-        fields = ('id', 'name','semester','semester_name')
+        fields = ('id', 'name','semester','semester_name','role')
     
 
 
@@ -89,3 +89,30 @@ class RegisterStudentSerializer(serializers.ModelSerializer):
             "semester",
             "semester_name"
         ]
+
+class TheoryInternalMarkSerializer(serializers.ModelSerializer):
+    student_name = serializers.CharField(source="student.name", read_only=True)
+    subject_name = serializers.CharField(source="subject.name", read_only=True)
+    average_internal_mark = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TheoryInternalMark
+        fields = [
+            "id",
+            "student",
+            "student_name",
+            "subject",
+            "subject_name",
+            "se1",
+            "se2",
+            "se3",
+            "average_internal_mark", 
+        ]
+
+    def get_average_internal_mark(self, obj):
+        se1 = obj.se1 or 0
+        se2 = obj.se2 or 0
+        se3 = obj.se3 or 0
+
+        total_marks = se1 + se2 + se3
+        return total_marks / 3

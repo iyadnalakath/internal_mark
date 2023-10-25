@@ -51,7 +51,7 @@ class Subject(models.Model):
     semester = models.ForeignKey(
         Semester, on_delete=models.CASCADE, related_name="semester_subject", null=True, blank=True
     )
-
+    role = models.CharField(max_length=50,null=True,blank=True)
 
 class Account(AbstractBaseUser):
     user_admin = "admin"
