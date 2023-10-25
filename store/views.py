@@ -2,10 +2,11 @@ from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAdminUser,IsAuthenticated
 from projectaccount.models import Account, Subject,Semester
-from store.models import Student, TheoryInternalMark
-from store.serializer import RegisterStudentSerializer, RegisterTeacherSerializer, SemesterSerializer, SubjectSerializer, TheoryInternalMarkSerializer
+from store.models import LabInternalMark, Student, TheoryInternalMark
+from store.serializer import LabInternalMarkSerializer, RegisterStudentSerializer, RegisterTeacherSerializer, SemesterSerializer, SubjectSerializer, TheoryInternalMarkSerializer
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import viewsets
 # Create your views here.
 
 
@@ -76,25 +77,75 @@ class StudentRegistrationView(ModelViewSet):
         return Student.objects.all()
 
 
-    # def list(self, request, *args, **kwargs):
-    #         queryset = self.get_queryset()
-
-    #         if self.request.user.role == "teacher":
-    #             if self.request.GET.get("exam_name"):
-    #                 exam_name = self.request.GET.get("exam_name")
-    #                 queryset = queryset.filter(exam_name=exam_name)
-
-    #             queryset = queryset.filter(teacher=self.request.user.id)
-    #             serializer = QuestionsSerializer(
-    #                 queryset, many=True, context={"request": self.request}
-    #             )
-    #             return Response(serializer.data, status=status.HTTP_200_OK)
-
-    #         else:
-    #             return super().list(request, *args, **kwargs)
-            
 
 class TheoryInternalMarkViews(ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = TheoryInternalMark.objects.all()
     serializer_class = TheoryInternalMarkSerializer
+
+
+class LabInternalMarkViews(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = LabInternalMark.objects.all()
+    serializer_class = LabInternalMarkSerializer
+
+
+
+# class StudentSubjectMarksViewSet(viewsets.ReadOnlyModelViewSet):
+#     permission_classes = [IsAuthenticated]
+#     serializer_class = TheoryInternalMarkSerializer
+#     queryset = TheoryInternalMark.objects.all()
+#     def list(self, request, *args, **kwargs):
+#         semester_id = self.request.query_params.get('semester_id')
+        
+#         # Get all students for the given semester
+#         students = Student.objects.filter(semester=semester_id)
+
+#         student_data = []
+
+#         for student in students:
+#             # Get theory internal marks for the student in the given semester
+#             theory_marks = TheoryInternalMark.objects.filter(student=student, semester=semester_id)
+
+#             # Get lab internal marks for the student in the given semester
+#             lab_marks = LabInternalMark.objects.filter(student=student, semester=semester_id)
+
+#             # Serialize the data
+#             theory_serializer = TheoryInternalMarkSerializer(theory_marks, many=True)
+#             lab_serializer = LabInternalMarkSerializer(lab_marks, many=True)
+
+#             student_data.append({
+#                 'student_name': student.name,
+#                 'register_number': student.register_number,
+#                 'theory_marks': theory_serializer.data,
+#                 'lab_marks': lab_serializer.data,
+#             })
+
+#         return Response(student_data)
+
+from rest_framework.views import APIView
+#
+class StudentSubjectMarks(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        semester_id = self.request.query_params.get('semester_id')
+
+        students = Student.objects.filter(semester=semester_id)
+
+        student_data = []
+
+        for student in students:
+            theory_marks = TheoryInternalMark.objects.filter(student=student, semester=semester_id)
+            lab_marks = LabInternalMark.objects.filter(student=student, semester=semester_id)
+
+            theory_serializer = TheoryInternalMarkSerializer(theory_marks, many=True)
+            lab_serializer = LabInternalMarkSerializer(lab_marks, many=True)
+
+            student_data.append({
+                'student': RegisterStudentSerializer(student).data,
+                'theory_marks': theory_serializer.data,
+                'lab_marks': lab_serializer.data,
+            })
+
+        return Response(student_data)
