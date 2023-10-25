@@ -5,17 +5,30 @@ from .models import LabInternalMark, Student, TheoryInternalMark
 
 
 class SemesterSerializer(serializers.ModelSerializer):
+
+    total_semester_count = serializers.SerializerMethodField()
     class Meta:
         model = Semester
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'total_semester_count')
+
+    def get_total_semester_count(self, obj):
+        return Semester.objects.count()
+
+    
 
 class SubjectSerializer(serializers.ModelSerializer):
     # semester = serializers.PrimaryKeyRelatedField(queryset=Semester.objects.all(), many=True)
     semester_name = serializers.CharField(source="semester.name", read_only=True)
+    total_subject_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Subject
-        fields = ('id', 'name','semester','semester_name','role')
+        fields = ('id', 'name','semester','semester_name','role','total_subject_count')
+
+
+    def get_total_subject_count(self, obj):
+        return Subject.objects.count()
+
     
 
 
@@ -27,10 +40,11 @@ class RegisterTeacherSerializer(serializers.ModelSerializer):
 
     password = serializers.CharField(write_only=True)
     copy_pass = serializers.CharField(read_only=True)
+    total_teachers_count = serializers.SerializerMethodField()
     
     class Meta:
         model = Account
-        fields = ["id", "full_name", "username", "password", "subject", "subject_name", "copy_pass"]
+        fields = ["id", "full_name", "username", "password", "subject", "subject_name", "copy_pass","total_teachers_count"]
         extra_kwargs = {
             "password": {"write_only": True, "required": True},
         }
@@ -67,6 +81,10 @@ class RegisterTeacherSerializer(serializers.ModelSerializer):
         ret = super().to_representation(instance)
         ret['subject_name'] = [subject.name for subject in instance.subject.all()]
         return ret
+    
+    def get_total_teachers_count(self, obj):
+        return Account.objects.filter(role="teacher").count()
+
 
     # def to_representation(self, instance):
     #     ret = super().to_representation(instance)
@@ -78,6 +96,7 @@ class RegisterStudentSerializer(serializers.ModelSerializer):
 
     semester = serializers.PrimaryKeyRelatedField(queryset=Semester.objects.all())
     semester_name = serializers.CharField(source="semester.name", read_only=True)
+    total_students_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Student
@@ -87,8 +106,13 @@ class RegisterStudentSerializer(serializers.ModelSerializer):
             "register_number",
             "roll_number",
             "semester",
-            "semester_name"
+            "semester_name",
+            "total_students_count"
         ]
+
+
+    def get_total_students_count(self, obj):
+        return Student.objects.count()
 
 class TheoryInternalMarkSerializer(serializers.ModelSerializer):
     student_name = RegisterStudentSerializer(source="student",read_only=True)
