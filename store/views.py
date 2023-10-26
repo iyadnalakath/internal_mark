@@ -27,13 +27,24 @@ class SubjectViews(ModelViewSet):
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
 class SemesterViews(ModelViewSet):
     permission_classes = [IsAuthenticated]
-    queryset = Semester.objects.all()
     serializer_class = SemesterSerializer
 
+    def get_queryset(self):
+        user = self.request.user
 
+        # Check if the user has an admin role
+        if user.role == 'admin':
+            return Semester.objects.all()
+
+        # Get the subjects associated with the teacher
+        subjects = user.subject.all()
+
+        # Get the semesters associated with those subjects
+        semesters = Semester.objects.filter(semester_subject__in=subjects).distinct()
+
+        return semesters
     # def list(self, request, *args, **kwargs):
     #         queryset = self.get_queryset()
 
