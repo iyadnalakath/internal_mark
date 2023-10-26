@@ -3,7 +3,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAdminUser,IsAuthenticated
 from projectaccount.models import Account, Subject,Semester
 from store.models import LabInternalMark, Student, TheoryInternalMark
-from store.serializer import LabInternalMarkSerializer, RegisterStudentSerializer, RegisterTeacherSerializer, SemesterSerializer, SubjectSerializer, TheoryInternalMarkSerializer
+from store.serializer import LabInternalMarkSerializer, RegisterStudentSerializer, RegisterTeacherSerializer, SemesterCountSerializer, SemesterSerializer, SubjectSerializer, TheoryInternalMarkSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets
@@ -149,3 +149,24 @@ class StudentSubjectMarks(APIView):
             })
 
         return Response(student_data)
+    
+
+class SemesterCountAPIView(APIView):
+    def get(self, request, format=None):
+        semesters = Semester.objects.all()
+        counts = []
+
+        for semester in semesters:
+            teachers_count = Account.objects.filter(role='teacher', subject__semester=semester).count()
+            students_count = Student.objects.filter(semester=semester).count()
+            subjects_count = Subject.objects.filter(semester=semester).count()
+
+            counts.append({
+                'semester_name': semester.name,
+                'teachers_count': teachers_count,
+                'students_count': students_count,
+                'subjects_count': subjects_count
+            })
+
+        serializer = SemesterCountSerializer(counts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

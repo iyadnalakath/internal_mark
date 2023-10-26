@@ -8,6 +8,8 @@ from rest_framework_nested import routers
 
 urlpatterns = [
     path('admin/list/internalmark/', views.StudentSubjectMarks.as_view(), name='admin_internalmark'),
+    path('admin/semester_counts/', views.SemesterCountAPIView.as_view(), name='semester-counts'),
+
 ]
 
 urlpatterns =  urlpatterns
