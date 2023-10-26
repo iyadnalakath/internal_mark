@@ -163,6 +163,7 @@ class SemesterCountAPIView(APIView):
 
             counts.append({
                 'semester_name': semester.name,
+                'semester_id': semester.id,
                 'teachers_count': teachers_count,
                 'students_count': students_count,
                 'subjects_count': subjects_count

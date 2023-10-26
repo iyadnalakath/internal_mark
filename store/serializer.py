@@ -220,6 +220,7 @@ class LabInternalMarkSerializer(serializers.ModelSerializer):
 
 class SemesterCountSerializer(serializers.Serializer):
     semester_name = serializers.CharField()
+    semester_id = serializers.IntegerField()
     teachers_count = serializers.IntegerField()
     students_count = serializers.IntegerField()
     subjects_count = serializers.IntegerField()
